@@ -34,6 +34,7 @@ class GoogleCloudStorage extends BaseStorage {
     })
   }
 
+  // No need to serve because absolute URLs are returned from save()
   serve () {
     return function customServe (req, res, next) {
       next()
@@ -45,8 +46,22 @@ class GoogleCloudStorage extends BaseStorage {
   }
 
   read (options) {
-    const file = this.bucket.file(options.path)
-    return file.createReadStream()
+    return new Promise((resolve, reject) => {
+      const rs = this.bucket.file(options.path).createReadStream()
+      const data = []
+
+      rs.on('error', err => {
+        return reject(err)
+      })
+
+      rs.on('data', chunk => {
+        data.push(chunk)
+      })
+
+      rs.on('end', () => {
+        resolve(Buffer.concat(data))
+      })
+    })
   }
 }
 
