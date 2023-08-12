@@ -31,7 +31,7 @@ class GoogleCloudStorage extends _ghostStorageBase2.default {
 
   exists(fileName, dir) {
     console.debug('exists: ', dir, fileName);
-    return this.bucket.file(`${dir}/${fileName}`).exists().then(function (_ref) {
+    return this.bucket.file(`${dir.replace(/^\/+/, '')}/${fileName}`).exists().then(function (_ref) {
       var _ref2 = _slicedToArray(_ref, 1),
           exists = _ref2[0];
 
@@ -46,7 +46,7 @@ class GoogleCloudStorage extends _ghostStorageBase2.default {
     var targetDir = this.getTargetDir(BASE_PATH);
 
     return this.getUniqueFileName(file, targetDir).then(function (uniqueFileName) {
-      return _this.bucket.upload(file.path, {
+      return _this.bucket.upload(file.path.replace(/^\/+/, ''), {
         destination: uniqueFileName,
         metadata: {
           cacheControl: 'public, max-age=2592000' // 30 days
@@ -68,7 +68,7 @@ class GoogleCloudStorage extends _ghostStorageBase2.default {
   }
 
   delete(fileName) {
-    return this.bucket.file(fileName).delete();
+    return this.bucket.file(fileName.replace(/^\/+/, '')).delete();
   }
 
   read(options) {
