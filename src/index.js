@@ -16,7 +16,7 @@ class GoogleCloudStorage extends BaseStorage {
 
   exists (fileName, dir) {
     console.debug('exists: ', dir, fileName)
-    return this.bucket.file(`${dir}/${fileName}`).exists().then(([exists]) => {
+    return this.bucket.file(`${dir.replace(/^\/+/, '')}/${fileName}`).exists().then(([exists]) => {
       return exists
     })
   }
@@ -26,7 +26,7 @@ class GoogleCloudStorage extends BaseStorage {
     const targetDir = this.getTargetDir(BASE_PATH)
 
     return this.getUniqueFileName(file, targetDir).then((uniqueFileName) => {
-      return this.bucket.upload(file.path, {
+      return this.bucket.upload(file.path.replace(/^\/+/, ''), {
         destination: uniqueFileName,
         metadata: {
           cacheControl: 'public, max-age=2592000' // 30 days
@@ -45,7 +45,7 @@ class GoogleCloudStorage extends BaseStorage {
   }
 
   delete (fileName) {
-    return this.bucket.file(fileName).delete()
+    return this.bucket.file(fileName.replace(/^\/+/, '')).delete()
   }
 
   read (options) {
